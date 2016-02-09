@@ -39,6 +39,7 @@ class LinuxProcMapReader
 		typedef LinuxProcMap::const_iterator const_iterator;
 	public:
 		void load(void);
+		void dumpAsTxt(const std::string & filename) const;
 		const LinuxProcMapEntry* getEntry(void* addr) const;
 		const_iterator begin(void) const { return procMap.begin(); };
 		const_iterator end(void) const { return procMap.end(); };

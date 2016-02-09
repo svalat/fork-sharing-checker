@@ -13,6 +13,9 @@ You can compile with the configure script wrapping cmake :
 mkdir build
 cd build
 ../configure --prefix=YOUR_PREFIX
+make
+make test
+make install
 ```
 
 Or use directly cmake if needed :
@@ -21,15 +24,17 @@ Or use directly cmake if needed :
 mkdir build
 cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=YOUR_PREFIX
+make test
+make install
 ```
 
 How to use
 ----------
 
-Just include `ForkSharingChecker.h` in you application and use it like :
+Just include `fork-sharing-checker/ForkSharingChecker.h` in you application and use it like :
 
 ```c
-#include <ForkSharingChecker.h>
+#include <fork-sharing-checker/Checker.h>
 
 int main(void)
 {
@@ -60,6 +65,62 @@ Now just link to `fork-sharing-checker` library :
 ```sh
 gcc main.cpp -lfork-sharing-checker
 ```
+
+Now you can run you application and use the `fork-sharing-checker` command to get some statistics :
+
+```sh
+fork-sharing-checker example-dump-after-1/ example-dump-after-2/
+```
+
+You will get something like :
+
+```
+#File                                    Size(KB)   Mapped(%)   Shared(%)
+example                                  4          100         100
+example                                  4          100         100
+example                                  4          100           0
+[heap]                                   132        100           0
+Anonymous                                32772      100          49
+libc-2.17.so                             1752        25          20
+libc-2.17.so                             2048         0           0
+libc-2.17.so                             16         100         100
+libc-2.17.so                             8          100           0
+Anonymous                                20          60          20
+libgcc_s-4.8.5-20150702.so.1             84          14           4
+libgcc_s-4.8.5-20150702.so.1             2044         0           0
+libgcc_s-4.8.5-20150702.so.1             4          100         100
+libgcc_s-4.8.5-20150702.so.1             4          100         100
+libm-2.17.so                             1028         6           0
+libm-2.17.so                             2044         0           0
+libm-2.17.so                             4          100         100
+libm-2.17.so                             4          100         100
+libstdc++.so.6.0.19                      932         51          36
+libstdc++.so.6.0.19                      2048         0           0
+libstdc++.so.6.0.19                      32         100         100
+libstdc++.so.6.0.19                      8          100           0
+Anonymous                                84          19           4
+libfork-sharing-checker.so               100         84          84
+libfork-sharing-checker.so               2044         0           0
+libfork-sharing-checker.so               4          100         100
+libfork-sharing-checker.so               4          100           0
+ld-2.17.so                               132         84          18
+Anonymous                                20         100          80
+Anonymous                                12          66          66
+ld-2.17.so                               4          100         100
+ld-2.17.so                               4          100           0
+Anonymous                                4          100         100
+[stack]                                  136         17           5
+[vdso]                                   8           50           0
+[vsyscall]                               4            0           0
+#TOTAL                                   47556       72          36
+```
+
+What it produce
+---------------
+
+It will create a firectory with a `map.json` which is a dump of the `/proc/self/map` file in JSON format.
+And a raw file for each entry which contain a list of `size_t` entry containing the physical page frame number (PFN)
+of each virtual page (considering 4K) in the segment.
 
 How it work
 -----------

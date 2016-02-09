@@ -11,7 +11,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <string>
-#include "../lib/ForkSharingChecker.h"
+#include "../src/lib/Checker.h"
 
 /*******************  FUNCTION  *********************/
 int main(int argc,char ** argv)

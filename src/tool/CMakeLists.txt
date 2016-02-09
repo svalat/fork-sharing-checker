@@ -7,5 +7,8 @@
 ######################################################
 
 ######################################################
-add_subdirectory(lib)
-add_subdirectory(tool)
+add_executable(fork-sharing-checker-cmd main.cpp)
+target_link_libraries(fork-sharing-checker-cmd fork-sharing-checker)
+
+######################################################
+install(TARGETS fork-sharing-checker-cmd RUNTIME DESTINATION bin RENAME fork-sharing-checker)

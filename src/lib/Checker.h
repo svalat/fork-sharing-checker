@@ -6,8 +6,8 @@
              LICENSE  : CeCILL-C
 *****************************************************/
 
-#ifndef FSC_DUMP_H
-#define FSC_DUMP_H
+#ifndef FORK_SHARING_CHECKER_H
+#define FORK_SHARING_CHECKER_H
 
 /*******************  FUNCTION  *********************/
 #ifdef __cplusplus
@@ -24,4 +24,4 @@ extern "C" {
 }
 #endif
 
-#endif //FSC_DUMP_H
+#endif //FORK_SHARING_CHECKER_H

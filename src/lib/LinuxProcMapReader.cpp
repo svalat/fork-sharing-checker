@@ -74,6 +74,25 @@ void LinuxProcMapReader::load(void)
 }
 
 /*******************  FUNCTION  *********************/
+void LinuxProcMapReader::dumpAsTxt(const std::string& filename) const
+{
+	//open
+	FILE * fp = fopen(filename.c_str(),"w+");
+	if (fp == NULL)
+	{
+		perror(filename.c_str());
+		abort();
+	}
+	
+	//write
+	for (LinuxProcMap::const_iterator it = procMap.begin() ; it != procMap.end() ; ++it)
+		fprintf(fp,"%p-%p 0x%lx %s\n",it->lower,it->upper,it->offset,it->file.c_str());
+	
+	//close
+	fclose(fp);
+}
+
+/*******************  FUNCTION  *********************/
 const LinuxProcMapEntry * LinuxProcMapReader::getEntry(void* addr) const
 {
 	//search

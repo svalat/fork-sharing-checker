@@ -8,7 +8,7 @@
 
 /********************  HEADERS  *********************/
 //internal
-#include "ForkSharingChecker.h"
+#include "Checker.h"
 #include "LinuxProcMapReader.hpp"
 #include "ProcPagemapReader.hpp"
 //htopml
@@ -57,7 +57,7 @@ static void convertToJson(JsonState& json, const LinuxProcMapReader & value)
 static void dumpMapToFile(const LinuxProcMapReader & procMap,const string & directory,const string & filename)
 {
 	//path
-	string path = directory + string("/")+filename;
+	string path = directory + string("/")+filename+".json";
 	
 	//open file
 	FILE * fp = fopen(path.c_str(),"w+");
@@ -78,6 +78,9 @@ static void dumpMapToFile(const LinuxProcMapReader & procMap,const string & dire
 	
 	//close
 	fclose(fp);
+	
+	//ok for convenient we also dump in txt format for C tools
+	procMap.dumpAsTxt(directory+string("/")+filename+".txt");
 }
 
 /*******************  FUNCTION  *********************/
@@ -139,7 +142,7 @@ void forkSharingCheckerDump(const char* dumpName, const char * extraName,bool pi
 	//load proc map to get segments and dump to file
 	LinuxProcMapReader procMap;
 	procMap.load();
-	dumpMapToFile(procMap,dirName,"map.json");
+	dumpMapToFile(procMap,dirName,"map");
 	
 	//open pagemap
 	ProcPageMapReader pageMapReader;

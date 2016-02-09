@@ -33,4 +33,5 @@ endif(ENABLE_GCC_COVERAGE)
 ######################################################
 #build subdirs
 add_subdirectory(src)
+add_subdirectory(example)
 add_subdirectory(extern-deps)
