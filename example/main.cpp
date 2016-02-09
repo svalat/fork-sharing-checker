@@ -30,13 +30,13 @@ int main(int argc,char ** argv)
 	const char * extra = (pid == 0) ? "-1" : "-2";
 	
 	//now dump before touching
-	forkSharingCheckerDump("example-dump-before",extra,false);
+	forkSharingChecker("example-dump-before",extra,false);
 	
 	//each touch half
 	memset(sharedMem,0,size/2);
 	
 	//now dump after touching
-	forkSharingCheckerDump("example-dump-after",extra,false);
+	forkSharingChecker("example-dump-after",extra,false);
 	
 	//exit
 	EXIT_SUCCESS;

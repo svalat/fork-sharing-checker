@@ -118,7 +118,7 @@ static void dumpPFNOfMapEntry(ProcPageMapReader & pageMapReader,const LinuxProcM
 }
 
 /*******************  FUNCTION  *********************/
-void forkSharingCheckerDump(const char* dumpName, const char * extraName,bool pid)
+void forkSharingChecker(const char* dumpName, const char * extraName,bool pid)
 {
 	//final dirname
 	std::string dirName = dumpName;

@@ -19,7 +19,7 @@ extern "C" {
 	 * @param dumpName Name of the directory which will be created to store the mapping.
 	 * @param pid Add PID on directory name
 	**/
-	void forkSharingCheckerDump(const char * dumpName,const char * extraName,bool pid);
+	void forkSharingChecker(const char * dumpName,const char * extraName,bool pid);
 #ifdef __cplusplus
 }
 #endif

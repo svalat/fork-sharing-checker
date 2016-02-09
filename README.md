@@ -51,12 +51,12 @@ int main(void)
 		extra = "parent";
 	
 	//dump just after fork if we want some ref
-	forkSharingCheckerDump("example-dump-before",extra,false);
+	forkSharingChecker("example-dump-before",extra,false);
 	
 	//do stuff
 	
 	//now dump after touching
-	forkSharingCheckerDump("example-dump-after",extra,false);
+	forkSharingChecker("example-dump-after",extra,false);
 }
 ```
 
