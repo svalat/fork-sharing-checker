@@ -17,7 +17,7 @@
 int main(int argc,char ** argv)
 {
 	//allocate some memory
-	size_t size = 32 * 1024 * 1024;
+	size_t size = 64 * 1024 * 1024;
 	char * sharedMem = new char[size];
 	
 	//touch it to be sure about mapping
@@ -34,6 +34,9 @@ int main(int argc,char ** argv)
 	
 	//each touch half
 	memset(sharedMem,0,size/2);
+	
+	//new allocation not shared
+	char * notShared = new char[size];
 	
 	//now dump after touching
 	forkSharingChecker("example-dump-after",extra,false);

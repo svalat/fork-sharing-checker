@@ -47,13 +47,14 @@ static const char * cstHelp = "fork-sharing-checker -r {REF} -t {TARGET} [-h] [-
 \n\
 With:\n\
 	-r {REF}    The reference dump.\n\
-	-t {TARGEt} The target dump.\n\
+	-t {TARGET} The target dump.\n\
 	-h          To print this help message\n\
 	-p          Print percentage of mapped and shared instead of absolute size\n\
 	-a          Print only the anonymous mappings\n\
 	-s          Sort based on segment size\n\
 	-S          Sort based on shared size or ratio\n\
 	-m          Sort based on mapped size or ratio\n\
+	-o          Only if has shared (remove 0)\n\
 ";
 
 /********************  ENUM  ************************/
@@ -73,6 +74,7 @@ struct CmdOptions
 	bool percent;
 	bool anon;
 	SortMode sort;
+	bool onlyShared;
 };
 
 /*********************  STRUCT  *********************/
@@ -147,9 +149,10 @@ void parseArgs(CmdOptions & options,int argc, char ** argv)
 	options.percent = false;
 	options.anon = false;
 	options.sort = SORT_ADDR;
+	options.onlyShared = false;
 
 	//loop over options
-	while ((c = getopt (argc, argv, "hr:t:pasSm")) != -1)
+	while ((c = getopt (argc, argv, "hr:t:pasSmo")) != -1)
 	{
 		switch(c)
 		{
@@ -179,6 +182,9 @@ void parseArgs(CmdOptions & options,int argc, char ** argv)
 			case 'm':
 				options.sort = SORT_MAPPED;
 				break;
+			case 'o':
+				options.onlyShared = true;
+				break;
 			default:
 				fprintf(stderr,"Unsupported option %c\n",c);
 				abort();
@@ -198,8 +204,12 @@ std::string getEntryName(const std::string & file)
 {
 	char fname[4096] = "Anonymous";
 	if (file.empty() == false)
+	{
 		strcpy(fname,file.c_str());
-	return fname;
+		return basename(fname);
+	} else {
+		return fname;
+	}
 }
 
 /*******************  FUNCTION  *********************/
@@ -318,13 +328,17 @@ int main(int argc, char ** argv)
 				out.shared++;
 		}
 		
-		//add for output
-		outVec.push_back(out);
-		
-		//update total
-		total.size += t.pages;
-		total.mapped += out.mapped;
-		total.shared += out.shared;
+		//check only shared
+		if (out.shared > 0)
+		{
+			//add for output
+			outVec.push_back(out);
+			
+			//update total
+			total.size += t.pages;
+			total.mapped += out.mapped;
+			total.shared += out.shared;
+		}
 	}
 	
 	//print

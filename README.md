@@ -69,7 +69,7 @@ gcc main.cpp -lfork-sharing-checker
 Now you can run you application and use the `fork-sharing-checker` command to get some statistics :
 
 ```sh
-fork-sharing-checker example-dump-after-parent/ example-dump-after-child/
+fork-sharing-checker -r example-dump-after-parent/ -t example-dump-after-child/
 ```
 
 You will get the sharing between ref (here parent) and target (here child) considering the mapping of target :
@@ -127,7 +127,7 @@ fork-sharing-checker -r {REF} -t {TARGET} [-h] [-p] [-a] [-s|-S|-m]
 
 With:
         -r {REF}    The reference dump.
-        -t {TARGEt} The target dump.
+        -t {TARGET} The target dump.
         -h          To print this help message
         -p          Print percentage of mapped and shared instead of absolute size
         -a          Print only the anonymous mappings
