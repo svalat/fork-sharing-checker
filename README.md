@@ -75,44 +75,46 @@ fork-sharing-checker example-dump-after-1/ example-dump-after-2/
 You will get something like :
 
 ```
-#File                                    Size(KB)   Mapped(%)   Shared(%)
-example                                  4          100         100
-example                                  4          100         100
-example                                  4          100           0
-[heap]                                   132        100           0
-Anonymous                                32772      100          49
-libc-2.17.so                             1752        25          20
-libc-2.17.so                             2048         0           0
-libc-2.17.so                             16         100         100
-libc-2.17.so                             8          100           0
-Anonymous                                20          60          20
-libgcc_s-4.8.5-20150702.so.1             84          14           4
-libgcc_s-4.8.5-20150702.so.1             2044         0           0
-libgcc_s-4.8.5-20150702.so.1             4          100         100
-libgcc_s-4.8.5-20150702.so.1             4          100         100
-libm-2.17.so                             1028         6           0
-libm-2.17.so                             2044         0           0
-libm-2.17.so                             4          100         100
-libm-2.17.so                             4          100         100
-libstdc++.so.6.0.19                      932         51          36
-libstdc++.so.6.0.19                      2048         0           0
-libstdc++.so.6.0.19                      32         100         100
-libstdc++.so.6.0.19                      8          100           0
-Anonymous                                84          19           4
-libfork-sharing-checker.so               100         84          84
-libfork-sharing-checker.so               2044         0           0
-libfork-sharing-checker.so               4          100         100
-libfork-sharing-checker.so               4          100           0
-ld-2.17.so                               132         84          18
-Anonymous                                20         100          80
-Anonymous                                12          66          66
-ld-2.17.so                               4          100         100
-ld-2.17.so                               4          100           0
-Anonymous                                4          100         100
-[stack]                                  136         17           5
-[vdso]                                   8           50           0
-[vsyscall]                               4            0           0
-#TOTAL                                   47556       72          36
+#File                                       Size(KB)       Mapped(%)   Shared(%)
+#-------------------------------------------------------------------------------
+example                                            4             100         100
+example                                            4             100         100
+example                                            4             100           0
+[heap]                                           132             100           0
+Anonymous                                      32772             100          49
+libc-2.17.so                                    1752              25          20
+libc-2.17.so                                    2048               0           0
+libc-2.17.so                                      16             100         100
+libc-2.17.so                                       8             100           0
+Anonymous                                         20              60          20
+libgcc_s-4.8.5-20150702.so.1                      84              14           4
+libgcc_s-4.8.5-20150702.so.1                    2044               0           0
+libgcc_s-4.8.5-20150702.so.1                       4             100         100
+libgcc_s-4.8.5-20150702.so.1                       4             100         100
+libm-2.17.so                                    1028               6           0
+libm-2.17.so                                    2044               0           0
+libm-2.17.so                                       4             100         100
+libm-2.17.so                                       4             100         100
+libstdc++.so.6.0.19                              932              51          36
+libstdc++.so.6.0.19                             2048               0           0
+libstdc++.so.6.0.19                               32             100         100
+libstdc++.so.6.0.19                                8             100           0
+Anonymous                                         84              19           4
+libfork-sharing-checker.so                       100              84          84
+libfork-sharing-checker.so                      2044               0           0
+libfork-sharing-checker.so                         4             100         100
+libfork-sharing-checker.so                         4             100           0
+ld-2.17.so                                       132              84          18
+Anonymous                                         20             100          80
+Anonymous                                         12              66          66
+ld-2.17.so                                         4             100         100
+ld-2.17.so                                         4             100           0
+Anonymous                                          4             100         100
+[stack]                                          136              17           5
+[vdso]                                             8              50           0
+[vsyscall]                                         4               0           0
+#-------------------------------------------------------------------------------
+#TOTAL                                         47556              72          36
 ```
 
 What it produce
