@@ -13,6 +13,7 @@
 #include <cstring>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 //gnu
 #include <getopt.h>
 //unix
@@ -20,6 +21,7 @@
 //locals
 #include "../lib/Reader.hpp"
 #include "../lib/ProcPagemapReader.hpp"
+#include "../../extern-deps/from-htopml/json/ConvertToJson.h"
 
 /*******************  NAMESPACE  ********************/
 using namespace ForkSharingChecker;
@@ -29,7 +31,7 @@ struct OutputEntry
 {
 	//functions
 	OutputEntry(const std::string & name);
-	void reset(const std::string & name,size_t size);
+	void reset(const std::string & name,size_t size,size_t base);
 	void print(bool percent) const;
 
 	//values
@@ -37,13 +39,16 @@ struct OutputEntry
 	size_t size;
 	size_t mapped;
 	size_t shared;
+	size_t base;
 };
 
 /*********************  TYPES  **********************/
 typedef std::vector<OutputEntry> OutputEntryVector;
+typedef std::vector<OutputEntryVector> OutputTimelineVector;
 
 /********************  GLOBALS  *********************/
-static const char * cstHelp = "fork-sharing-checker -r {REF} -t {TARGET} [-h] [-p] [-a] [-s|-S|-m]\n\
+static const char * cstHelp = "fork-sharing-checker -r {REF} -t {TARGET} [-h] [-p] [-a] \n\
+                     [-s|-S|-m] [-H] [-j] [-T {FRAMES}]\n\
 \n\
 With:\n\
 	-r {REF}    The reference dump.\n\
@@ -55,7 +60,15 @@ With:\n\
 	-S          Sort based on shared size or ratio\n\
 	-m          Sort based on mapped size or ratio\n\
 	-o          Only if has shared (remove 0)\n\
-";
+	-j          Output in json format\n\
+	-T {FRAMES} Timeline mode, see next part for more details\n\
+	-H          With timeline to write all the HTML files and JS files\n\
+\n\
+About Timeline mode: \n\
+The timeline mode permit to scan evolution of the sharing over time\n\
+between two processes. This mode require you provide ref and target names with {{frame}} \n\
+to be replaced by frame ID. The output will be a json to be used into the html webpage \n\
+dumped with -H option.\n";
 
 /********************  ENUM  ************************/
 enum SortMode
@@ -75,6 +88,10 @@ struct CmdOptions
 	bool anon;
 	SortMode sort;
 	bool onlyShared;
+	int frames;
+	bool timeline;
+	bool html;
+	bool json;
 };
 
 /*********************  STRUCT  *********************/
@@ -94,6 +111,21 @@ void parseArgs(CmdOptions & options,int argc, char ** argv);
 std::string getEntryName(const std::string & file);
 
 /*******************  FUNCTION  *********************/
+namespace htopml 
+{
+	void convertToJson(JsonState & json,const OutputEntry & entry)
+	{
+		json.openStruct();
+			json.printField("name",entry.name);
+			json.printField("size",entry.size);
+			json.printField("mapped",entry.mapped);
+			json.printField("shared",entry.shared);
+			json.printField("base",entry.base);
+		json.closeStruct();
+	}
+}
+
+/*******************  FUNCTION  *********************/
 SortOutputEntry::SortOutputEntry(const CmdOptions* options)
 {
 	this->options = options;
@@ -105,7 +137,7 @@ bool SortOutputEntry::operator()(const OutputEntry& a, const OutputEntry& b)
 	switch(options->sort)
 	{
 		case SORT_ADDR:
-			return true;
+			return a.base < b.base;
 		case SORT_SIZE:
 			return a.size > b.size;
 		case SORT_SHARED:
@@ -150,9 +182,13 @@ void parseArgs(CmdOptions & options,int argc, char ** argv)
 	options.anon = false;
 	options.sort = SORT_ADDR;
 	options.onlyShared = false;
+	options.frames = 0;
+	options.timeline = false;
+	options.html = false;
+	options.json = true;
 
 	//loop over options
-	while ((c = getopt (argc, argv, "hr:t:pasSmo")) != -1)
+	while ((c = getopt (argc, argv, "hr:t:pasSmoHT:j")) != -1)
 	{
 		switch(c)
 		{
@@ -185,6 +221,18 @@ void parseArgs(CmdOptions & options,int argc, char ** argv)
 			case 'o':
 				options.onlyShared = true;
 				break;
+			case 'j':
+				options.json = true;
+				break;
+			case 'H':
+				options.html = true;
+				break;
+			case 'T':
+				options.frames = atoi(optarg);
+				options.timeline = true;
+				options.onlyShared = true;
+				options.json = true;
+				break;
 			default:
 				fprintf(stderr,"Unsupported option %c\n",c);
 				abort();
@@ -215,16 +263,17 @@ std::string getEntryName(const std::string & file)
 /*******************  FUNCTION  *********************/
 OutputEntry::OutputEntry(const std::string& name)
 {
-	this->reset(name,0);
+	this->reset(name,0,0);
 }
 
 /*******************  FUNCTION  *********************/
-void OutputEntry::reset(const std::string& name, size_t size)
+void OutputEntry::reset(const std::string& name, size_t size,size_t base)
 {
 	this->name = name;
 	this->mapped = 0;
 	this->shared = 0;
 	this->size = size;
+	this->base = base;
 }
 
 /*******************  FUNCTION  *********************/
@@ -238,7 +287,7 @@ void OutputEntry::print(bool percent) const
 }
 
 /*******************  FUNCTION  *********************/
-void print(const CmdOptions & options,OutputEntryVector & outVec,OutputEntry & total)
+void printTxt(const CmdOptions & options,OutputEntryVector & outVec)
 {
 	//header
 	if (options.percent)
@@ -266,9 +315,20 @@ void print(const CmdOptions & options,OutputEntryVector & outVec,OutputEntry & t
 	SortOutputEntry sortFunc(&options);
 	std::sort(outVec.begin(),outVec.end(),sortFunc);
 	
+	//comput total
+	OutputEntry total("#TOTAL");
+	
 	//print values
 	for (OutputEntryVector::const_iterator it = outVec.begin() ; it != outVec.end() ; ++it)
+	{
+		//print
 		it->print(options.percent);
+		
+		//update total
+		total.size += it->size;
+		total.mapped += it->mapped;
+		total.shared += it->shared;
+	}
 			
 	//final
 	printf("#-------------------------------------------------------------------------------\n");
@@ -276,50 +336,53 @@ void print(const CmdOptions & options,OutputEntryVector & outVec,OutputEntry & t
 }
 
 /*******************  FUNCTION  *********************/
-int main(int argc, char ** argv)
+void print(const CmdOptions & options,OutputEntryVector & outVec)
 {
-	//args
-	CmdOptions options;
-	parseArgs(options,argc,argv);
-	
+	if (options.json)
+		htopml::convertToJson(std::cout,outVec);
+	else
+		printTxt(options,outVec);
+}
+
+/*******************  FUNCTION  *********************/
+void computeShared(const CmdOptions & options,OutputEntryVector & outVec, const std::string & refFile,const std::string & targetFile)
+{
 	//load
-	Reader ref(options.ref);
-	Reader target(options.target);
+	Reader refName(options.ref);
+	Reader targetName(options.target);
 	
 	//total
-	OutputEntry total("#TOTAL");
 	OutputEntry out("");
-	OutputEntryVector outVec;
 	
 	//loop on target
-	for (Reader::const_iterator it = target.begin() ; it != target.end() ; ++it)
+	for (Reader::const_iterator it = targetName.begin() ; it != targetName.end() ; ++it)
 	{
 		//some vars
-		const ReaderEntry & t = *it;
-		const ReaderEntry * lastRef = NULL;
+		const ReaderEntry & target = *it;
+		const ReaderEntry * ref = NULL;
 		
 		//setup out
-		out.reset(getEntryName(t.file),t.pages);
+		out.reset(getEntryName(target.file),target.pages,(size_t)target.base);
 		
 		//skip if only anon
-		if (options.anon && t.file.empty() == false)
+		if (options.anon && target.file.empty() == false)
 			continue;
 		
 		//loop on pages from target
-		for (void * i = t.base ; i < t.end ; (size_t&)i += PAGE_SIZE)
+		for (void * i = target.base ; i < target.end ; (size_t&)i += PAGE_SIZE)
 		{
 			//load ref
-			if (lastRef == NULL)
-				lastRef = ref.getEntry(i);
-			else if (lastRef->contain(i) == false)
-				lastRef = ref.getEntry(i);
+			if (ref == NULL)
+				ref = refName.getEntry(i);
+			else if (ref->contain(i) == false)
+				ref = refName.getEntry(i);
 			
 			//compare PFNs
-			size_t targetPFN = t.getPFN(i);
+			size_t targetPFN = target.getPFN(i);
 			size_t refPFN = 0;
 			
-			if (lastRef != NULL)
-				refPFN = lastRef->getPFN(i);
+			if (ref != NULL)
+				refPFN = ref->getPFN(i);
 			
 			//update counter
 			if (targetPFN != 0)
@@ -330,19 +393,65 @@ int main(int argc, char ** argv)
 		
 		//check only shared
 		if (out.shared > 0)
-		{
-			//add for output
 			outVec.push_back(out);
-			
-			//update total
-			total.size += t.pages;
-			total.mapped += out.mapped;
-			total.shared += out.shared;
-		}
 	}
+}
+
+/*******************  FUNCTION  *********************/
+std::string replaceInString(std::string value,const std::string & pattern,const std::string & by)
+{
+	size_t pos = value.find(pattern);
+	if (pos == std::string::npos)
+		return value;
+	else
+		return value.replace(pos,pattern.size(),by);
+}
+
+/*******************  FUNCTION  *********************/
+void loadFrame(const CmdOptions & options,OutputTimelineVector & timelineOut,int id)
+{
+	//add new entry
+	OutputEntryVector tmp;
+	timelineOut.push_back(tmp);
+	OutputEntryVector & frame = timelineOut.back();
 	
-	//print
-	print(options,outVec,total);
+	//compute file names
+	char idStr[64];
+	sprintf(idStr,"%d",id);
+	std::string ref = replaceInString(options.ref,"{{frame}}",idStr);
+	std::string target = replaceInString(options.target,"{{frame}}",idStr);
+	
+	//load
+	computeShared(options,frame,ref,target);
+}
+
+/*******************  FUNCTION  *********************/
+void printTimeline(const CmdOptions & options, OutputTimelineVector & timelineOut)
+{
+	htopml::convertToJson(std::cout,timelineOut);
+}
+
+/*******************  FUNCTION  *********************/
+int main(int argc, char ** argv)
+{
+	//args
+	CmdOptions options;
+	parseArgs(options,argc,argv);
+	
+	//rendering mode
+	if (options.timeline)
+	{
+		OutputTimelineVector timelineOut;
+		timelineOut.reserve(options.frames);
+		for (int i = 0 ; i < options.frames ; i++)
+			loadFrame(options,timelineOut,i);
+		printTimeline(options,timelineOut);
+	} else {
+		OutputEntryVector outVec;
+		computeShared(options,outVec,options.ref,options.target);
+		//print
+		print(options,outVec);
+	}
 	
 	//ok finish
 	return EXIT_SUCCESS;
