@@ -72,7 +72,7 @@ Now you can run you application and use the `fork-sharing-checker` command to ge
 fork-sharing-checker example-dump-after-parent/ example-dump-after-child/
 ```
 
-You will get something like :
+You will get the sharing between ref (here parent) and target (here child) considering the mapping of target :
 
 ```
 #File                                       Size(KB)       Mapped(%)   Shared(%)
