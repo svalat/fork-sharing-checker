@@ -117,6 +117,26 @@ Anonymous                                          4             100         100
 #TOTAL                                         47556              72          36
 ```
 
+Tool options
+------------
+
+The `fork-sharing-checker` command support the options : 
+
+```
+fork-sharing-checker -r {REF} -t {TARGET} [-h] [-p] [-a] [-s|-S|-m]
+
+With:
+        -r {REF}    The reference dump.
+        -t {TARGEt} The target dump.
+        -h          To print this help message
+        -p          Print percentage of mapped and shared instead of absolute size
+        -a          Print only the anonymous mappings
+        -s          Sort based on segment size
+        -S          Sort based on shared size or ratio
+        -m          Sort based on mapped size or ratio
+
+```
+
 What it produce
 ---------------
 
