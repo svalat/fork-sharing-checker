@@ -44,7 +44,8 @@ int main(int argc, char ** argv)
 	Reader target(argv[2]);
 	
 	//header
-	printf("%-40s %-10s %s   %s\n","#File","Size(KB)","Mapped","Shared");
+	printf("%-40s %11s       %s   %s\n","#File","Size(KB)","Mapped(%)","Shared(%)");
+	printf("#-------------------------------------------------------------------------------\n");
 	
 	//total
 	size_t totalPages = 0;
@@ -87,7 +88,7 @@ int main(int argc, char ** argv)
 		char fname[4096] = "Anonymous";
 		if (t.file.empty() == false)
 			strcpy(fname,t.file.c_str());
-		printf("%-40s %-10lu %3lu      %3lu\n",
+		printf("%-40s %11lu       %9lu    %8lu\n",
 				basename(fname),
 				t.pages * PAGE_SIZE/1024,
 				(100*mapped)/t.pages,
@@ -100,7 +101,8 @@ int main(int argc, char ** argv)
 	}
 	
 	//final
-	printf("%-40s %-10lu %3lu      %3lu\n",
+	printf("#-------------------------------------------------------------------------------\n");
+	printf("%-40s %11lu       %9lu    %8lu\n",
 				"#TOTAL",
 				totalPages * PAGE_SIZE/1024,
 				(100*totalMapped)/totalPages,
