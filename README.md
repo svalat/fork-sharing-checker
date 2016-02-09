@@ -132,6 +132,12 @@ to physical addresses using `/proc/self/pagemap`. The last one only be available
 then 2.6.25, to be check it looks that some new distribution tend to make it readable only from root 
 (arround centos7, debian7).
 
+Limitation
+----------
+
+The command line tool currently don't take cake of possible usage of `mremap` so it consider shared pages
+only while looking at the same virtual address.
+
 Licence
 -------
 
