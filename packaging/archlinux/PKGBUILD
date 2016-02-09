@@ -1,0 +1,38 @@
+######################################################
+#            PROJECT  : fork-sharing-checking        #
+#            VERSION  : 0.1.0-dev-dev                    #
+#            DATE     : 02/2016                      #
+#            AUTHOR   : Valat Sébastien - CERN       #
+#            LICENSE  : CeCILL-C                     #
+######################################################
+
+# Maintainer: Sebastien Valat <sebastien.valat-dev@cern.ch>
+pkgname=fork-sharing-checker
+pkgver=0.1.0-dev
+pkgrel=1
+pkgdesc="A short tool to check page sharing after forking to track COW (Copy On Write) usage"
+arch=('i686' 'x86_64')
+url="https://github.com/svalat/fork-sharing-checker"
+license=('CeCILL-C')
+depends=('binutils')
+makedepends=('cmake' 'gcc')
+options=()
+source=(https://github.com/downloads/svalat/fork-sharing-checker/$pkgname-$pkgver.tar.bz2)
+md5sums=('296e506b380a3a1483821b6e32c11102') #generate with 'makepkg -g'
+
+build() {
+	cd "$srcdir/$pkgname-$pkgver"
+
+	mkdir build
+	cd build
+	cmake ..
+	make
+	make test
+}
+
+package() {
+	cd "$srcdir/$pkgname-$pkgver"
+
+	cd build
+	make DESTDIR="$pkgdir/" install
+}

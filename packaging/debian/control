@@ -1,0 +1,13 @@
+Source: fork-sharing-checker
+Section: devel
+Priority: optional
+Maintainer: Sébastien Valat <sebastien.valat@cern.ch>
+Build-Depends: debhelper (>= 7), cmake, cdbs
+Standards-Version: 3.9.4
+Homepage: https://github.com/svalat/fork-sharing-checker
+
+Package: fork-sharing-checker
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},binutils
+Description: A short tool to check page sharing after forking to track COW (Copy On Write) usage.
+ A short tool to check page sharing after forking to track COW (Copy On Write) usage.

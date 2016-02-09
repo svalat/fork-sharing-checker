@@ -1,0 +1,23 @@
+This package was debianized by Sébastien Valat <sebastien.valat@cern.ch> on
+Thu Feb 09 12:47:15 2016 +0100
+
+It was downloaded from <url://>
+
+Upstream Author(s):
+
+    Sébastien Valat <sebastien.valat@cern.ch>
+
+Copyright:
+
+    Copyright (C) 2010 Sébastien Valat
+
+License:
+
+    CeCILL-C
+
+The Debian packaging is:
+
+    Copyright (C) 2011 Sébastien Valat <sebastien.valat@cern.ch>
+
+and is licensed under the CeCILL-C,
+see `http://www.cecill.info/licences/Licence_CeCILL-C_V1-en.html'.

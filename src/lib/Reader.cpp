@@ -1,6 +1,6 @@
 /*****************************************************
              PROJECT  : fork-sharing-checking
-             VERSION  : 0.1.0
+             VERSION  : 0.1.0-dev
              DATE     : 02/2016
              AUTHOR   : Valat Sébastien - CERN
              LICENSE  : CeCILL-C

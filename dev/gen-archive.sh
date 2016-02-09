@@ -1,14 +1,18 @@
+#!/bin/bash
 ######################################################
-#            PROJECT  : fork-sharing-checking        #
+#            PROJECT  : MATT                         #
 #            VERSION  : 0.1.0-dev                    #
 #            DATE     : 02/2016                      #
-#            AUTHOR   : Valat Sébastien - CERN       #
+#            AUTHOR   : Valat Sébastien              #
 #            LICENSE  : CeCILL-C                     #
 ######################################################
 
 ######################################################
-add_executable(fork-sharing-checker-cmd main.cpp)
-target_link_libraries(fork-sharing-checker-cmd fork-sharing-checker)
+#extract version
+version=0.1.0-dev
+prefix=malt-${version}
 
 ######################################################
-install(TARGETS fork-sharing-checker-cmd RUNTIME DESTINATION bin RENAME fork-sharing-checker)
+echo "Generate ${prefix}.tar.gz..."
+git archive --format=tar --prefix=${prefix}/ HEAD | gzip > ${prefix}.tar.gz
+echo "Finished"
