@@ -10,17 +10,17 @@ How to compile
 You can compile with the configure script wrapping cmake :
 
 ```sh
-	mkdir build
-	cd build
-	../configure --prefix=YOUR_PREFIX
+mkdir build
+cd build
+../configure --prefix=YOUR_PREFIX
 ```
 
 Or use directly cmake if needed :
 
 ```sh
-	mkdir build
-	cd build
-	cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=YOUR_PREFIX
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=YOUR_PREFIX
 ```
 
 How to use
@@ -53,6 +53,12 @@ int main(void)
 	//now dump after touching
 	forkSharingCheckerDump("example-dump-after","",false);
 }
+```
+
+Now just link to `fork-sharing-checker` library :
+
+```sh
+gcc main.cpp -lfork-sharing-checker
 ```
 
 How it work
