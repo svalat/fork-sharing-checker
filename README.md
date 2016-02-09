@@ -51,12 +51,12 @@ int main(void)
 		extra = "parent";
 	
 	//dump just after fork if we want some ref
-	forkSharingCheckerDump("example-dump-before","",false);
+	forkSharingCheckerDump("example-dump-before",extra,false);
 	
 	//do stuff
 	
 	//now dump after touching
-	forkSharingCheckerDump("example-dump-after","",false);
+	forkSharingCheckerDump("example-dump-after",extra,false);
 }
 ```
 
@@ -69,7 +69,7 @@ gcc main.cpp -lfork-sharing-checker
 Now you can run you application and use the `fork-sharing-checker` command to get some statistics :
 
 ```sh
-fork-sharing-checker example-dump-after-1/ example-dump-after-2/
+fork-sharing-checker example-dump-after-parent/ example-dump-after-child/
 ```
 
 You will get something like :
