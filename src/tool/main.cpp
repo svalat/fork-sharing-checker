@@ -1,5 +1,5 @@
 /*****************************************************
-             PROJECT  : fork-sharing-checking
+             PROJECT  : fork-sharing-checker
              VERSION  : 0.1.0-dev
              DATE     : 02/2016
              AUTHOR   : Valat Sébastien - CERN
@@ -14,6 +14,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <fstream>
 //gnu
 #include <getopt.h>
 //unix
@@ -345,42 +346,54 @@ void print(const CmdOptions & options,OutputEntryVector & outVec)
 }
 
 /*******************  FUNCTION  *********************/
-void computeShared(const CmdOptions & options,OutputEntryVector & outVec, const std::string & refFile,const std::string & targetFile)
+void computeShared(const CmdOptions & options,OutputEntryVector & outVec, const std::string & refFile,const std::string & targetFile,const std::string & maskFile = "")
 {
 	//load
-	Reader refName(options.ref);
-	Reader targetName(options.target);
+	Reader refReader(refFile);
+	Reader targetReader(targetFile);
+	Reader * maskReader = &targetReader;
+	
+	//if mask
+	if (maskFile.empty() == false)
+		maskReader = new Reader(maskFile);
 	
 	//total
 	OutputEntry out("");
 	
 	//loop on target
-	for (Reader::const_iterator it = targetName.begin() ; it != targetName.end() ; ++it)
+	for (Reader::const_iterator it = maskReader->begin() ; it != maskReader->end() ; ++it)
 	{
 		//some vars
-		const ReaderEntry & target = *it;
+		const ReaderEntry & range = *it;
 		const ReaderEntry * ref = NULL;
+		const ReaderEntry * target = NULL;
 		
 		//setup out
-		out.reset(getEntryName(target.file),target.pages,(size_t)target.base);
+		out.reset(getEntryName(range.file),range.pages,(size_t)range.base);
 		
 		//skip if only anon
-		if (options.anon && target.file.empty() == false)
+		if (options.anon && range.file.empty() == false)
 			continue;
 		
 		//loop on pages from target
-		for (void * i = target.base ; i < target.end ; (size_t&)i += PAGE_SIZE)
+		for (void * i = range.base ; i < range.end ; (size_t&)i += PAGE_SIZE)
 		{
+			//load target
+			target = refReader.getEntry(i);
+			
 			//load ref
 			if (ref == NULL)
-				ref = refName.getEntry(i);
+				ref = refReader.getEntry(i);
 			else if (ref->contain(i) == false)
-				ref = refName.getEntry(i);
+				ref = refReader.getEntry(i);
 			
 			//compare PFNs
-			size_t targetPFN = target.getPFN(i);
+			size_t targetPFN = 0;
 			size_t refPFN = 0;
 			
+			//load
+			if (target != NULL)
+				targetPFN = target->getPFN(i);
 			if (ref != NULL)
 				refPFN = ref->getPFN(i);
 			
@@ -392,7 +405,7 @@ void computeShared(const CmdOptions & options,OutputEntryVector & outVec, const 
 		}
 		
 		//check only shared
-		if (out.shared > 0)
+		if (out.size > 0 && (out.shared > 0 || options.onlyShared == false))
 			outVec.push_back(out);
 	}
 }
@@ -401,10 +414,10 @@ void computeShared(const CmdOptions & options,OutputEntryVector & outVec, const 
 std::string replaceInString(std::string value,const std::string & pattern,const std::string & by)
 {
 	size_t pos = value.find(pattern);
-	if (pos == std::string::npos)
-		return value;
-	else
-		return value.replace(pos,pattern.size(),by);
+	if (pos != std::string::npos)
+		value.replace(pos,pattern.size(),by);
+	
+	return value;
 }
 
 /*******************  FUNCTION  *********************/
@@ -420,15 +433,36 @@ void loadFrame(const CmdOptions & options,OutputTimelineVector & timelineOut,int
 	sprintf(idStr,"%d",id);
 	std::string ref = replaceInString(options.ref,"{{frame}}",idStr);
 	std::string target = replaceInString(options.target,"{{frame}}",idStr);
+	std::string mask = replaceInString(options.target,"{{frame}}","0");
 	
 	//load
-	computeShared(options,frame,ref,target);
+	computeShared(options,frame,ref,target,mask);
+}
+
+/*******************  FUNCTION  *********************/
+void copyFile(const std::string & input, const std::string & output)
+{
+	std::ifstream infile(input.c_str(), std::ios_base::binary);
+	std::ofstream outfile(output.c_str(), std::ios_base::binary);
+	outfile << infile.rdbuf();
 }
 
 /*******************  FUNCTION  *********************/
 void printTimeline(const CmdOptions & options, OutputTimelineVector & timelineOut)
 {
-	htopml::convertToJson(std::cout,timelineOut);
+	if (options.html)
+	{
+		printf("Created timeline.js\n");
+		std::ofstream out("timeline.js");
+		out << "timeline = ";
+		htopml::convertToJson(out,timelineOut);
+		out << ";";
+		out.close();
+		printf("Created index.html\n");
+		copyFile(std::string(VIEW_PATH)+"/index.html","index.html");
+	} else {
+		htopml::convertToJson(std::cout,timelineOut);
+	}
 }
 
 /*******************  FUNCTION  *********************/

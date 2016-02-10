@@ -7,9 +7,4 @@
 ######################################################
 
 ######################################################
-add_executable(example-simple example-simple.cpp)
-target_link_libraries(example-simple fork-sharing-checker)
-
-######################################################
-add_executable(example-timeline example-timeline.cpp)
-target_link_libraries(example-timeline fork-sharing-checker)
+install(FILES index.html DESTINATION share/fork-sharing-checker/view)

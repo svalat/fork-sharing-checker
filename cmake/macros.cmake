@@ -1,5 +1,5 @@
 ######################################################
-#            PROJECT  : fork-sharing-checking        #
+#            PROJECT  : fork-sharing-checker         #
 #            VERSION  : 0.1.0-dev                    #
 #            DATE     : 02/2016                      #
 #            AUTHOR   : Valat Sébastien - CERN       #

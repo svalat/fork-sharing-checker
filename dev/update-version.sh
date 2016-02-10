@@ -1,9 +1,9 @@
 #!/bin/bash
 ######################################################
-#            PROJECT  : MATT                         #
+#            PROJECT  : fork-sharing-checker         #
 #            VERSION  : 0.1.0-dev                    #
 #            DATE     : 02/2016                      #
-#            AUTHOR   : Valat Sébastien              #
+#            AUTHOR   : Valat Sébastien - CERN       #
 #            LICENSE  : CeCILL-C                     #
 ######################################################
 
