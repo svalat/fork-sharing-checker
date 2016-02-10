@@ -74,7 +74,7 @@ of each virtual page (considering 4K) in the segment.
 Reading the profiles
 --------------------
 
-Now just link to `fork-sharing-checker` library :
+Now just link to `fork-sharing-checker` library (see example directory) :
 
 ```sh
 gcc main.cpp -lfork-sharing-checker
@@ -166,7 +166,7 @@ About history line
 ------------------
 
 You can get a kind of view how your sharing reduces by taking some snapshots over time and naming the
-frame directories with an ID in the name. Then you can run the `fork-sharing-checker` as :
+frame directories with an ID in the name. Then you can run the `fork-sharing-checker` as (see example directory) :
 
 ```sh
 fork-sharing-checker -r example-dump-after-parent-{{frame}} -t example-dump-after-child-{{frame}} -H -T 10
