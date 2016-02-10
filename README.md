@@ -123,7 +123,8 @@ Tool options
 The `fork-sharing-checker` command support the options : 
 
 ```
-fork-sharing-checker -r {REF} -t {TARGET} [-h] [-p] [-a] [-s|-S|-m]
+fork-sharing-checker -r {REF} -t {TARGET} [-h] [-p] [-a] 
+                     [-s|-S|-m] [-H] [-j] [-T {FRAMES}]
 
 With:
         -r {REF}    The reference dump.
@@ -134,6 +135,16 @@ With:
         -s          Sort based on segment size
         -S          Sort based on shared size or ratio
         -m          Sort based on mapped size or ratio
+        -o          Only if has shared (remove 0)
+        -j          Output in json format
+        -T {FRAMES} Timeline mode, see next part for more details
+        -H          With timeline to write all the HTML files and JS files
+
+About Timeline mode: 
+The timeline mode permit to scan evolution of the sharing over time
+between two processes. This mode require you provide ref and target names with {{frame}} 
+to be replaced by frame ID. The output will be a json to be used into the html webpage 
+dumped with -H option.
 
 ```
 
