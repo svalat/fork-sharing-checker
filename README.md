@@ -172,6 +172,41 @@ fork-sharing-checker -r example-dump-after-parent-{{frame}} -t example-dump-afte
 
 [![Timeline view](https://raw.githubusercontent.com/svalat/fork-sharing-checker/master/src/view/screenshot.png)](https://raw.githubusercontent.com/svalat/fork-sharing-checker/master/src/view/screenshot.png)
 
+Find source of COW
+------------------
+
+If you observe that you loose some of your sharing due to copy on write (COW) you can use the `forkSharingCOWTracker`
+function which will mprotect all the anonymous memory and account accesses which make COW of the pages.
+It then produce a summary at the end of execution.
+
+```
+int main(void)
+{
+	//setup memory
+	fork();
+	forkSharingCOWTracker("cow-checker","",true);
+	//use mem
+}
+```
+
+You can also make manual snapshots instead of waiting the exit time with `forkSharingCOWDump`.
+
+The produced file looks like :
+
+```
+# Touched(KB)                                      func   source:line
+       32768                              __memset_sse2    :0
+           4                              __memset_sse2    :0
+           4                                         ??    ??:0
+```
+
+*Limitation 1* : it currently do not support multi-threads (or at least is not protected by mutexes which make it likely to fail).
+
+*Limitation 2* : due to a bug it filters out all the anonymous segment smaller than 64 KB so you will potentially not see all your memory
+if it is really fragmented in small peaces.
+
+*Limitation 3* : unmapping a segment don't trigger the tool, so if something do unmap then remap it it don't see it.
+
 How it work
 -----------
 
