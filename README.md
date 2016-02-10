@@ -4,7 +4,9 @@ fork-sharing-checker
 [![Build Status](https://travis-ci.org/svalat/fork-sharing-checker.png?branch=master)](https://travis-ci.org/svalat/fork-sharing-checker)
 
 This is a simple tool to quickly check which pages are still shared after forking and accessing your data.
-It can help to keep some statistics about the sharing over time in your application.
+It can help to keep some statistics about the sharing over time in your application. It also provide
+the necessary functions to find which lines of you code make you loosing the COW shared pages by tracking
+first write accesses.
 
 How to compile
 --------------
