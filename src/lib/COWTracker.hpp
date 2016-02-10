@@ -12,8 +12,6 @@
 /********************  HEADERS  *********************/
 //standard
 #include <map>
-//internal
-#include "STLNoFreeAllocator.hpp"
 
 /********************  MACROS  **********************/
 #define COW_MAX_SEGMENTS (2*4096)

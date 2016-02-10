@@ -68,7 +68,7 @@ void COWTracker::setupProtection(void)
 		size_t size = (size_t)it->upper-(size_t)it->lower;
 		
 		//only the anon one
-		if (it->file.empty() && size >= 64 * 1024)
+		if (it->file.empty() && size >= 64 * 1024)// ok need to find a way to remove this trick of 64K limit
 		{
 			segments[segmentCount].base = it->lower;
 			segments[segmentCount].size = size;
