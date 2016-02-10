@@ -1,6 +1,8 @@
 fork-sharing-checker
 ====================
 
+[![Build Status](https://travis-ci.org/svalat/fork-sharing-checker.png?branch=master)](https://travis-ci.org/svalat/fork-sharing-checker)
+
 This is a simple tool to quicly check which pages are still shared after forking and accessing your data.
 It can help to keep some statistics about the sharing over time in your application.
 
