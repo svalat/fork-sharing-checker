@@ -195,6 +195,7 @@ The produced file looks like :
 
 ```
 # Touched(KB)                                      func   source:line
+#---------------------------------------------------------------------
        32768                              __memset_sse2    :0
            4                              __memset_sse2    :0
            4                                         ??    ??:0

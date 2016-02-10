@@ -303,6 +303,7 @@ void COWTracker::dump(const std::string& filename)
 	
 	//header
 	fprintf(fp,"#%12s  %40s   %s\n","Touched(KB)","func","source:line");
+	fprintf(fp,"#---------------------------------------------------------------------\n");
 	
 	//print
 	for (std::vector<COWEntry*>::iterator it = entries.begin() ; it != entries.end() ; ++it)
