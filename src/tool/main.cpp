@@ -186,7 +186,7 @@ void parseArgs(CmdOptions & options,int argc, char ** argv)
 	options.frames = 0;
 	options.timeline = false;
 	options.html = false;
-	options.json = true;
+	options.json = false;
 
 	//loop over options
 	while ((c = getopt (argc, argv, "hr:t:pasSmoHT:j")) != -1)
@@ -379,7 +379,7 @@ void computeShared(const CmdOptions & options,OutputEntryVector & outVec, const 
 		for (void * i = range.base ; i < range.end ; (size_t&)i += PAGE_SIZE)
 		{
 			//load target
-			target = refReader.getEntry(i);
+			target = targetReader.getEntry(i);
 			
 			//load ref
 			if (ref == NULL)

@@ -43,8 +43,9 @@ int main(int argc,char ** argv)
 	//steps
 	for (int i = 0 ; i < 10 ; i++)
 	{
-		memset(sharedMem1,0,i*size/20);
-		memset(sharedMem3,0,i*size/20);
+		memset(sharedMem1,pid,i*size/20);
+		memset(sharedMem3,pid,i*size/20);
+		memset(notSharedMem,pid,i*size/10);
 		
 		char buffer[64];
 		sprintf(buffer,"-%s-%d",extra,i);

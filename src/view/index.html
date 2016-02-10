@@ -1,25 +1,229 @@
 <html>
 	<head>
-		<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+		<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 		<script src='timeline.js'></script>
+		<style type="text/css">
+			svg .boxes {
+				fill:blue;
+			}
+			
+			div.tooltip {   
+				position: absolute;           
+				text-align: center;
+				vertical-align:middle;
+				width: 180px;                  
+				padding: 5px;             
+				font: sans-serif; 
+				font-weight: bold;
+				background: black;   
+				color:white;
+				border: 0px;      
+				border-radius: 8px;           
+				pointer-events: none;         
+			}
+		</style>
 		<script>
-			//compute margins/size
-			var svgWidth  = 960,
-				svgHeight = 500,
-				margin = { top: 20, right: 20, bottom: 40, left: 40 },
-				chartWidth  = svgWidth  - margin.left - margin.right,
-				chartHeight = svgHeight - margin.top  - margin.bottom;
+			POWER_PS  = ['&nbsp;','K','M','G','T','P'];
+			POWER_NPS = [' ','K','M','G','T','P'];
+			SUBPOWER_PS  = ['&nbsp;','m','u','n'];
+			SUBPOWER_NPS = [' ','m','u','n','p'];
+			humanReadable = function(value,decimals,unit,protectedSpace)
+			{
+				var mul = 1000;
+				if (unit == 'B' || unit == 'B')
+					mul = 1024;
+				
+				if (value >= 1 && value < mul)
+					decimals = 0;
+				
+				if (value == 0)
+					decimals = 0;
+				
+				if (value >= 0.1 || value == 0)
+				{
+					var power = 0;
+					while (value >= mul)
+					{
+						power++;
+						value /= mul;
+					}
+
+					var res;
+					if (protectedSpace)
+						res = value.toFixed(decimals) + " " + this.POWER_PS[power] + unit;
+					else
+						res = value.toFixed(decimals) + " " + this.POWER_NPS[power] + unit;
+				} else {
+					var power = 0;
+					while (value < 0.1 && power < 4)
+					{
+						power++;
+						value *= 1000.0;
+					}
+
+					var res;
+					if (protectedSpace)
+						res = value.toFixed(decimals) + " " + this.SUBPOWER_PS[power] + unit;
+					else
+						res = value.toFixed(decimals) + " " + this.SUBPOWER_NPS[power] + unit;
+				}
+
+				return res;
+			}
+		
+			function size(x)
+			{
+				//return x;
+				return Math.log2(x);
+			}
+		
+			function draw()
+			{
+				console.log(timeline);
 			
-			//setup svg
-			var svg = d3.select('body').append('svg')
-				.attr('width',  svgWidth)
-				.attr('height', svgHeight)
-				.append('g')
-					.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-			
-			
+				//compute margins/size
+				var svgWidth  = $(window).width(),
+					svgHeight = $(window).height(),
+					margin = { top: 20, right: 20, bottom: 40, left: 40 },
+					chartWidth  = svgWidth  - margin.left - margin.right,
+					chartHeight = svgHeight - margin.top  - margin.bottom;
+				
+				//setup svg
+				var svg = d3.select('body').append('svg')
+					.attr('width',  svgWidth)
+					.attr('height', svgHeight)
+					.append('g')
+						.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+				
+				//x scale
+				var x = d3.time.scale().range([0, chartWidth])
+					.domain([0,timeline.length]);
+					
+				var tooltip = d3.select("body").append("div")   
+					.attr("class", "tooltip")               
+					.style("opacity", 0);
+				
+				//format
+				var totY = 0;
+				var boxesList = [];
+				var links = [];
+				for (var i in timeline[0])
+				{
+					if (totY > 0)
+						totY += 1.0;
+					var h = size(timeline[0][i].size);
+					//var h = timeline[0][i].size;
+					for (var j in timeline)
+					{
+						boxesList.push({x:j,y:totY,h:h,size:timeline[j][i].size,shared:timeline[j][i].shared});
+						timeline[j][i].pos = totY;
+						if (j != 0)
+						{
+							links.push({
+								x0:j-1,
+								x1:j,
+								y:totY,
+								h:h,
+								p0: timeline[j-1][i].shared / timeline[j-1][i].size,
+								p1: timeline[j][i].shared / timeline[j][i].size,
+								size: timeline[j][i].size,
+								loss: timeline[j-1][i].shared - timeline[j][i].shared
+							});
+						}
+					}
+					totY += h;
+				}
+				
+				//yscale
+				var y = d3.time.scale().range([0, chartHeight])
+					.domain([0,totY]);
+					
+				//lines
+				var linesId = [];
+				for (var i = 0 ; i < timeline.length ; i++)
+					linesId.push(i);
+				
+				//draw lines
+				console.log(linesId);
+				var lines = svg.selectAll(".lines")
+					.data(linesId)
+						.enter()
+							.append("line")
+								.attr("class", "lines")
+								.attr("x1", function(d) { return x(d); })
+								.attr("x2", function(d) { return x(d); })
+								.attr("y1", 0)
+								.attr("y2", chartHeight)
+								.attr("stroke-width", 2)
+								.attr("stroke", "black");
+
+				//draw boxes
+				var boxes = svg.selectAll(".boxes")
+					.data(boxesList)
+						.enter()
+							.append("rect")
+								.attr("class", "boxes")
+								.attr("x", function(d) { return x(d.x-0.1); })
+								.attr("width", function(d) {return x(0.2); })
+								.attr("y", function(d) { return y(d.y); })
+								.attr("height", function(d) {return y(d.h); })
+								.on("mouseover", function(d) {      
+									tooltip.transition()        
+										.duration(200)      
+										.style("opacity", .9);      
+									tooltip .html(humanReadable(d.shared * 4096,0,"B")+" / "  + humanReadable(d.size * 4096,0,"B") + " ("+Math.floor(100*d.shared/d.size)+" %)")  
+										.style("left", (d3.event.pageX) + "px")     
+										.style("top", (d3.event.pageY - 28) + "px");    
+									})                  
+								.on("mouseout", function(d) {       
+									tooltip.transition()        
+										.duration(500)      
+										.style("opacity", 0);   
+								});
+				
+				//links
+				var link = svg.append("g").selectAll(".link")
+					.data(links)
+						.enter().append("path")
+							.attr("class", "link")
+							.attr("d", function(d) {
+								var curvature = 0.5;
+								var x0 = x(d.x0+0.1),
+									x1 = x(d.x1-0.1),
+									xi = d3.interpolateNumber(x0, x1),
+									x2 = xi(curvature),
+									x3 = xi(1 - curvature),
+									y0 = y(d.y),
+									y1 = y(d.y+d.h * d.p1);
+									y2 = y(d.y+d.h * d.p0);
+								return "M" + x0 + "," + y0
+								    + "H" + x1
+								    + "V" + y1
+								    + "L" + x0 + "," + y2
+								    + "Z";
+// 									+ "C" + x2 + "," + y0
+// 									+ " " + x3 + "," + y1
+// 									+ " " + x1 + "," + y1;
+							})
+							.style("fill", "gray")
+							.on("mouseover", function(d) {      
+								tooltip.transition()        
+									.duration(200)      
+									.style("opacity", .9);      
+								tooltip .html("-"+humanReadable(d.loss * 4096,0,"B")+" ("+Math.floor(100*d.loss/d.size)+" %)")  
+									.style("left", (d3.event.pageX) + "px")     
+									.style("top", (d3.event.pageY - 28) + "px");    
+								})                  
+							.on("mouseout", function(d) {       
+								tooltip.transition()        
+									.duration(500)      
+									.style("opacity", 0);   
+							});
+// 							.style("stroke", "blue");
+			}
 		</script>
 	</head>
-	<body>
+	<body onload="draw()">
 	</body>
 </html>
