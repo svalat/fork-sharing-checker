@@ -1,5 +1,24 @@
 <html>
 	<head>
+		<script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+		<script src='timeline.js'></script>
+		<script>
+			//compute margins/size
+			var svgWidth  = 960,
+				svgHeight = 500,
+				margin = { top: 20, right: 20, bottom: 40, left: 40 },
+				chartWidth  = svgWidth  - margin.left - margin.right,
+				chartHeight = svgHeight - margin.top  - margin.bottom;
+			
+			//setup svg
+			var svg = d3.select('body').append('svg')
+				.attr('width',  svgWidth)
+				.attr('height', svgHeight)
+				.append('g')
+					.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+			
+			
+		</script>
 	</head>
 	<body>
 	</body>
