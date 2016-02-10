@@ -17,7 +17,7 @@
 
 /********************  MACROS  **********************/
 //TODO use sysconf ideally
-#define PAGE_SIZE 4096
+#define PAGE_SIZE (4096ul)
 
 /*******************  NAMESPACE  ********************/
 namespace ForkSharingChecker

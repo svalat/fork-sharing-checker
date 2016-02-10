@@ -6,8 +6,8 @@
              LICENSE  : CeCILL-C
 *****************************************************/
 
-#ifndef FORK_SHARING_CHECKER_DB_HPP
-#define FORK_SHARING_CHECKER_DB_HPP
+#ifndef FSC_READER_HPP
+#define FSC_READER_HPP
 
 /********************  HEADERS  *********************/
 //standard
@@ -59,4 +59,4 @@ class Reader
 
 }
 
-#endif //FORK_SHARING_CHECKER_DB_HPP
+#endif //FSC_READER_HPP

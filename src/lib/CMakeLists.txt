@@ -10,12 +10,18 @@
 include_directories(../../extern-deps/from-htopml/)
 
 ######################################################
+find_package(Threads REQUIRED)
+
+######################################################
 add_library(fork-sharing-checker SHARED Reader.cpp
                                         Checker.cpp
+                                        COWTracker.cpp
+                                        NoFreeAllocator.cpp
                                         ProcPagemapReader.cpp 
                                         LinuxProcMapReader.cpp 
                                         $<TARGET_OBJECTS:htopml-json>)
-
+target_link_libraries(fork-sharing-checker ${CMAKE_THREAD_LIBS_INIT})
+                                        
 ######################################################
 add_subdirectory(tests)
 

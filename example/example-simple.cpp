@@ -31,6 +31,7 @@ int main(int argc,char ** argv)
 	
 	//now dump before touching
 	forkSharingChecker("example-dump-before",extra,false);
+	forkSharingCOWTracker("example-cause",extra,false);
 	
 	//each touch half
 	memset(sharedMem,0,size/2);
