@@ -62,6 +62,16 @@ int main(void)
 }
 ```
 
+What it produce
+---------------
+
+It will create a firectory with a `map.json` which is a dump of the `/proc/self/map` file in JSON format.
+And a raw file for each entry which contain a list of `size_t` entry containing the physical page frame number (PFN)
+of each virtual page (considering 4K) in the segment.
+
+Reading the profiles
+--------------------
+
 Now just link to `fork-sharing-checker` library :
 
 ```sh
@@ -161,13 +171,6 @@ fork-sharing-checker -r example-dump-after-parent-{{frame}} -t example-dump-afte
 ```
 
 [![Timeline view](https://raw.githubusercontent.com/svalat/fork-sharing-checker/master/src/view/screenshot.png)](https://raw.githubusercontent.com/svalat/fork-sharing-checker/master/src/view/screenshot.png)
-
-What it produce
----------------
-
-It will create a firectory with a `map.json` which is a dump of the `/proc/self/map` file in JSON format.
-And a raw file for each entry which contain a list of `size_t` entry containing the physical page frame number (PFN)
-of each virtual page (considering 4K) in the segment.
 
 How it work
 -----------
