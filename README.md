@@ -222,9 +222,9 @@ How it work
 This tool use `/proc/self/map` to get the current mapping into virtual addresses, then it translate
 to physical addresses using `/proc/self/pagemap`. The last one only be available for Linux kernel greater
 then 2.6.25, to be check it looks that some new distribution tend to make it readable only from root 
-(arround centos7, debian7).
+(arround debian7). It runs fine on Centos 6/7 and SLC 6.
 
-It will not work anymore without root accesses after 4.0 kernels as they disable access to page frame number by users
+It will not work anymore without root accesses after 4.0 kernels as they disabled access to page frame number by users
 for security reasons (https://lwn.net/Articles/642069/).
 
 Limitation
