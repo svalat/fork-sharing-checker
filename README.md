@@ -209,12 +209,12 @@ The produced file looks like :
 Currently we capture only 2 calls from call stack, but you can capture more by recompiling the library with setting 
 `-DSTACK_SIZE={what_you_want}` on cmake or `--with-stack-size={what_you_want}` if you use the configure script.
 
-*Limitation 1* : it currently do not support multi-threads (or at least is not protected by mutexes which make it likely to fail).
+**Limitations**:
 
-*Limitation 2* : due to a bug it filters out all the anonymous segment smaller than 64 KB so you will potentially not see all your memory
+ - it currently do not support multi-threads (or at least is not protected by mutexes which make it likely to fail).
+ - due to a bug it filters out all the anonymous segment smaller than 64 KB so you will potentially not see all your memory
 if it is really fragmented in small peaces.
-
-*Limitation 3* : unmapping a segment don't trigger the tool, so if something do unmap then remap it it don't see it.
+ - unmapping a segment don't trigger the tool, so if something do unmap then remap it it don't see it.
 
 How it work
 -----------
