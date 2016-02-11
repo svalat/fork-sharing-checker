@@ -199,9 +199,15 @@ The produced file looks like :
 # Touched(KB)                                      func   source:line
 #---------------------------------------------------------------------
        32768                              __memset_sse2    :0
+                                                   main    /home/svalat/Projects/ForkSharingChecker/example/example-simple.cpp:40
            4                              __memset_sse2    :0
+                                                   main    /home/svalat/Projects/ForkSharingChecker/example/example-simple.cpp:40
            4                                         ??    ??:0
+                                                     ??    ??:0
 ```
+
+Currently we capture only 2 calls from call stack, but you can capture more by recompiling the library with setting 
+`-DSTACK_SIZE={what_you_want}` on cmake or `--with-stack-size={what_you_want}` if you use the configure script.
 
 *Limitation 1* : it currently do not support multi-threads (or at least is not protected by mutexes which make it likely to fail).
 

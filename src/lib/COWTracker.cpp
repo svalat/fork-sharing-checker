@@ -93,7 +93,7 @@ void COWTracker::setupProtection(void)
 }
 
 /*******************  FUNCTION  *********************/
-bool COWTracker::onTouch(void* addr,void * caller)
+bool COWTracker::onTouch(void* addr,COWMiniStack & caller)
 {
 	//check validity
 	if (!isValid(addr))
@@ -159,14 +159,18 @@ void COWTracker::solveSymbols(const LinuxProcMapEntry& procMapEntry)
 	//create addr2line args
 	for (COWTrackerStats::iterator it = stats.begin() ; it != stats.end() ; ++it)
 	{
-		if (it->second.callSite.func.empty() && it->first >= procMapEntry.lower && it->first < procMapEntry.upper)
+		for (int i = 0 ; i < COW_MINI_STACK_SIZE ; i++)
 		{
-			hasEntries = true;
-			if (isSharedLib)
-				addr2lineCmd << ' '  << (void*)((size_t)it->first - (size_t)procMapEntry.lower);
-			else
-				addr2lineCmd << ' '  << (void*)((size_t)it->first);
-			lst.push_back(&it->second.callSite);
+			void * caller = it->first.stack[i];
+			if (it->second.callSite[i].func.empty() && caller >= procMapEntry.lower && caller < procMapEntry.upper)
+			{
+				hasEntries = true;
+				if (isSharedLib)
+					addr2lineCmd << ' '  << (void*)((size_t)caller - (size_t)procMapEntry.lower);
+				else
+					addr2lineCmd << ' '  << (void*)((size_t)caller);
+				lst.push_back(&it->second.callSite[i]);
+			}
 		}
 	}
 	
@@ -308,10 +312,18 @@ void COWTracker::dump(const std::string& filename)
 	//print
 	for (std::vector<COWEntry*>::iterator it = entries.begin() ; it != entries.end() ; ++it)
 	{
-		if ((*it)->callSite.line != -1)
-			fprintf(fp,"%12lu   %40s    %s:%d\n",(*it)->count*PAGE_SIZE/1024,(*it)->callSite.func.c_str(),(*it)->callSite.file.c_str(),(*it)->callSite.line);
+		if ((*it)->callSite[0].line != -1)
+			fprintf(fp,"%12lu   %40s    %s:%d\n",(*it)->count*PAGE_SIZE/1024,(*it)->callSite[0].func.c_str(),(*it)->callSite[0].file.c_str(),(*it)->callSite[0].line);
 		else
-			fprintf(fp,"%12lu   %s\n",(*it)->count*PAGE_SIZE/1024,(*it)->callSite.func.c_str());
+			fprintf(fp,"%12lu   %s\n",(*it)->count*PAGE_SIZE/1024,(*it)->callSite[0].func.c_str());
+		
+		for (int i = 1 ; i < COW_MINI_STACK_SIZE ; i++)
+		{
+			if ((*it)->callSite[i].line != -1)
+				fprintf(fp,"%12s   %40s    %s:%d\n","",(*it)->callSite[i].func.c_str(),(*it)->callSite[i].file.c_str(),(*it)->callSite[i].line);
+			else
+				fprintf(fp,"%12s   %s\n","",(*it)->callSite[i].func.c_str());
+		}
 	}
 		
 	//close
@@ -327,10 +339,15 @@ void COWTracker::dump(const std::string& filename)
 static void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 {
 	//use backtrace
-	void * bt[4];
-	backtrace(bt,3);
+	void * bt[3+COW_MINI_STACK_SIZE];
+	int cnt = backtrace(bt,3+COW_MINI_STACK_SIZE);
 
-	bool status = ForkSharingChecker::gblCOWTracker.onTouch(si->si_addr,bt[2]);
+	COWMiniStack stack;
+	memset(stack.stack,0,sizeof(stack.stack));
+	for (int i = 0 ; i < COW_MINI_STACK_SIZE && i < cnt-2 ; i++)
+		stack.stack[i] = bt[2+i];
+		
+	bool status = ForkSharingChecker::gblCOWTracker.onTouch(si->si_addr,stack);
 	
 	//this is for the first call
 	if (si->si_addr == NULL)
@@ -348,6 +365,19 @@ static void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 static void dumpOnExit(void)
 {
 	gblCOWTracker.dump(gblDumpFilename);
+}
+
+/*******************  FUNCTION  *********************/
+bool operator<(const COWMiniStack& a, const COWMiniStack& b)
+{
+	for (int i = 0 ; i < COW_MINI_STACK_SIZE ; i++)
+	{
+		if (a.stack[i] < b.stack[i])
+			return true;
+		else if (a.stack[i] > b.stack[i])
+			return false;
+	}
+	return false;
 }
 
 }

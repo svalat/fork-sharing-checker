@@ -15,6 +15,9 @@
 
 /********************  MACROS  **********************/
 #define COW_MAX_SEGMENTS (2*4096)
+#ifndef COW_MINI_STACK_SIZE
+	#define COW_MINI_STACK_SIZE 2
+#endif
 
 /*******************  NAMESPACE  ********************/
 namespace ForkSharingChecker
@@ -34,7 +37,13 @@ struct COWEntry
 {
 	COWEntry(void) {this->count = 0;};
 	size_t count;
-	COWCallSite callSite;
+	COWCallSite callSite[COW_MINI_STACK_SIZE];
+};
+
+/********************  STRUCT  **********************/
+struct COWMiniStack
+{
+	void * stack[COW_MINI_STACK_SIZE];
 };
 
 /********************  STRUCT  **********************/
@@ -45,8 +54,11 @@ struct COWSegments
 };
 
 /*********************  TYPES  **********************/
-typedef std::map<void*,COWEntry > COWTrackerStats;
+typedef std::map<COWMiniStack,COWEntry > COWTrackerStats;
 struct LinuxProcMapEntry;
+
+/*******************  FUNCTION  *********************/
+bool operator < (const COWMiniStack & a,const COWMiniStack & b);
 
 /*********************  CLASS  **********************/
 class COWTracker
@@ -55,7 +67,7 @@ class COWTracker
 		COWTracker(void);
 		~COWTracker(void);
 		void setupProtection(void);
-		bool onTouch(void* addr, void* caller);
+		bool onTouch(void* addr, ForkSharingChecker::COWMiniStack& caller);
 		void dump(const std::string & filename);
 	private:
 		bool isValid(void * addr);

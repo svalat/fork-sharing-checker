@@ -13,6 +13,10 @@ include_directories(../../extern-deps/from-htopml/)
 find_package(Threads REQUIRED)
 
 ######################################################
+set(STACK_SIZE "2" CACHE STRING "Set size of stack to capture.")
+add_definitions(-DCOW_MINI_STACK_SIZE=${STACK_SIZE})
+
+######################################################
 add_library(fork-sharing-checker SHARED Reader.cpp
                                         Checker.cpp
                                         COWTracker.cpp
