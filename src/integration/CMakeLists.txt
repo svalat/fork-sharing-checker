@@ -7,7 +7,5 @@
 ######################################################
 
 ######################################################
-add_subdirectory(lib)
-add_subdirectory(tool)
-add_subdirectory(view)
-add_subdirectory(integration)
+configure_file(fork-sharing-checker.pc.in fork-sharing-checker.pc @ONLY)
+install(TARGETS fork-sharing-checker.pc DESTINATION share/pkgconfig)
