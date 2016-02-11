@@ -224,6 +224,9 @@ to physical addresses using `/proc/self/pagemap`. The last one only be available
 then 2.6.25, to be check it looks that some new distribution tend to make it readable only from root 
 (arround centos7, debian7).
 
+It will not work anymore without root accesses after 4.0 kernels as they disable access to page frame number by users
+for security reasons.
+
 Limitation
 ----------
 
