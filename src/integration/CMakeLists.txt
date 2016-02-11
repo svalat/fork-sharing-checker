@@ -8,4 +8,4 @@
 
 ######################################################
 configure_file(fork-sharing-checker.pc.in fork-sharing-checker.pc @ONLY)
-install(TARGETS fork-sharing-checker.pc DESTINATION share/pkgconfig)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/fork-sharing-checker.pc DESTINATION share/pkgconfig)
