@@ -10,7 +10,7 @@
 ######################################################
 #extract version
 version=0.1.0-dev
-prefix=malt-${version}
+prefix=fork-sharing-checker-${version}
 
 ######################################################
 echo "Generate ${prefix}.tar.gz..."
