@@ -1,5 +1,5 @@
-fork-sharing-checker (0.1.0-dev) UNRELEASED; urgency=low
+fork-sharing-checker (0.2.0-dev) UNRELEASED; urgency=low
 
-  * Version 0.1.0-dev of fork-sharing-checker
+  * Version 0.2.0-dev of fork-sharing-checker
 
  -- Sébastien Valat <sebastien.valat@cern.ch>Tue, 09 Feb 2016 23:30:47 +0100
