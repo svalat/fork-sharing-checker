@@ -1,14 +1,14 @@
 ######################################################
 #            PROJECT  : fork-sharing-checker         #
-#            VERSION  : 0.1.0-dev-dev                #
-#            DATE     : 02/2016                      #
+#            VERSION  : 0.1.0                        #
+#            DATE     : 03/2016                      #
 #            AUTHOR   : Valat Sébastien - CERN       #
 #            LICENSE  : CeCILL-C                     #
 ######################################################
 
 # Maintainer: Sebastien Valat <sebastien.valat-dev@cern.ch>
 pkgname=fork-sharing-checker
-pkgver=0.1.0-dev
+pkgver=0.1.0
 pkgrel=1
 pkgdesc="A short tool to check page sharing after forking to track COW (Copy On Write) usage"
 arch=('i686' 'x86_64')
